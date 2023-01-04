@@ -8,12 +8,15 @@
 						<div>{{ player.nickname }}</div>
 					</div>
 				</div>
-			</div>
-			<div class="lobby-main box-gradient">
 				<div class="game-controls">
 					<Button @click="startGame()" text="Start Game" size="small" />
 				</div>
 			</div>
+			<!--<div class="lobby-main box-gradient">
+				<div class="game-controls">
+					<Button @click="startGame()" text="Start Game" size="small" />
+				</div>
+			</div>-->
 		</div>
 	</div>
 </template>
@@ -36,12 +39,14 @@ const state = reactive({
 
 const emit = defineEmits(['gameStarting']);
 
-ws.on('UPDATE_PLAYER_LIST', (data) => {
-	state.players = data;
-});
+onBeforeMount(() => {
+	ws.on('UPDATE_PLAYER_LIST', (data) => {
+		state.players = data;
+	});
 
-ws.on('GAME_STARTING', () => {
-	emit('gameStarting');
+	ws.on('GAME_STARTING', () => {
+		emit('gameStarting');
+	});
 });
 
 function startGame() {
@@ -59,16 +64,27 @@ onBeforeMount(async () => fetchPlayers());
 </script>
 
 <style lang="css" scoped>
+.container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100vh;
+	gap: 3.5rem;
+	position: relative;
+}
+
 .lobby-container {
 	display: flex;
 	flex-direction: row;
-	height: 35rem;
+	height: 30rem;
 	gap: 2rem;
 }
 
 .lobby-players {
 	display: flex;
 	flex-direction: column;
+	position: relative;
 	align-items: center;
 	width: 15rem;
 	padding: 1rem;
@@ -84,20 +100,20 @@ onBeforeMount(async () => fetchPlayers());
 	background-color: #0f0f0f59;
 }
 
-.lobby-main {
+/*.lobby-main {
 	display: flex;
 	flex-direction: column;
 	position: relative;
 	width: 40em;
 	border-radius: 1rem;
-}
+}*/
 
 .game-controls {
 	display: flex;
 	flex-direction: row;
 	position: absolute;
 	bottom: 0;
-	right: 0;
+	/*right: 0;*/
 	padding: 1rem;
 }
 </style>
