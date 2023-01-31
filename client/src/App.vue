@@ -2,7 +2,7 @@
 	<div class="texture">
 		<CheckingOnline v-if="!state.serverAvailable" @online="state.serverAvailable = true" />
 		<router-view v-if="state.serverAvailable" v-slot="{ Component, route }">
-			<transition name="page-slide" mode="out-in">
+			<transition name="page-fade" mode="out-in">
 				<div :key="route.name">
 					<component :is="Component" />
 				</div>
@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue';
+import { onBeforeUnmount, reactive } from 'vue';
 import CheckingOnline from '@/components/home/CheckingOnline.vue';
 
 import ws from '@/gateway/Websocket';
@@ -29,18 +29,23 @@ ws.on('ERROR_OCCURED', (error) => {
 		timeout: 4000
 	});
 });
+
+onBeforeUnmount(() => {
+	ws.off('ERROR_OCCURED');
+});
 </script>
 
 <style lang="css" scoped>
-.page-slide-enter-active,
-.page-slide-leave-active {
-	transition: 400ms ease all;
+.page-fade-enter-active,
+.page-fade-leave-active {
+	transition-duration: 0.3s;
+	transition-property: opacity;
+	transition-timing-function: ease;
 }
 
-.page-slide-enter-from,
-.page-slide-leave-to {
+.page-fade-enter-from,
+.page-fade-leave-to {
 	opacity: 0;
-	transform: translateY(60px);
 }
 
 .texture {

@@ -1,16 +1,20 @@
 <template>
 	<Freeze v-if="state.effect == 'freeze'" />
-	<GameHeader />
-	<GameStore v-if="state.storeOpen" @backToGame="state.storeOpen = false" />
-	<div v-if="!state.storeOpen" class="game-playable-container">
-		<div class="game-container box-gradient">
-			<h2 class="letters-title">Letters: </h2>
-			<h1 class="scrambled-letters">{{ state.letters }}</h1>
-			<p class="definition">{{ state.definition }}</p>
-			<input type="text" class="input-field" placeholder="Answer" v-model="state.answer">
-			<div class="game-controls">
-				<Button @click="state.storeOpen = true" text="Store" icon="fa-solid fa-store" small="small" />
-				<Button @click="checkWord" text="Check Word" icon="fa-solid fa-check" small="small" />
+
+	<div class="container">
+		<GameSidebar />
+		<div class="game-playable-container">
+			<div class="game-container box-gradient">
+				<h2 class="letters-title">Letters: </h2>
+				<h1 class="scrambled-letters">{{ state.letters }}</h1>
+				<p class="definition">{{ state.definition }}</p>
+				<form @submit.prevent="checkWord" class="guess-inputs">
+					<div>
+						<input type="text" class="input-field guess-field" placeholder="Answer" v-model="state.answer">
+					</div>
+					<div><Button type="submit" class="guess-button" text="Check Word" icon="fa-solid fa-check"
+							size="small" /></div>
+				</form>
 			</div>
 		</div>
 	</div>
@@ -18,9 +22,8 @@
 
 <script setup>
 import { onBeforeUnmount, reactive } from 'vue';
-import GameStore from './GameStore.vue';
 import Freeze from './effects/Freeze.vue';
-import GameHeader from './GameHeader.vue';
+import GameSidebar from './GameSidebar.vue';
 import Button from '@/components/Button.vue';
 import { useToast } from 'vue-toastification';
 
@@ -34,8 +37,7 @@ const state = reactive({
 	letters: '',
 	answer: '',
 	definition: '',
-	effect: '',
-	storeOpen: false
+	effect: ''
 });
 
 function checkWord() {
@@ -52,7 +54,7 @@ ws.on('INCORRECT_GUESS', () => toast.error('Incorrect Guess!'));
 
 ws.on('POWERUP_USED', (powerup) => {
 	toast(`You used the ${powerup} powerup!`);
-})
+});
 
 ws.on('POWERUP_RECIEVED', (powerup) => {
 	switch (powerup.name) {
@@ -88,12 +90,17 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="css" scoped>
+.container {
+	display: flex;
+}
+
 .game-playable-container {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 	height: 100vh;
+	width: 100%;
 	gap: 3.5rem;
 	position: relative;
 }
@@ -106,13 +113,15 @@ onBeforeUnmount(() => {
 	gap: 1rem;
 	padding: 2rem;
 	border-radius: 1rem;
-	width: 30rem;
+	width: 35rem;
 }
 
-.game-controls {
+.guess-inputs {
 	display: flex;
 	flex-direction: row;
-	gap: 1rem;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
 }
 
 .letters-title {
